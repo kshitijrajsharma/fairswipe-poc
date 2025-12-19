@@ -6,6 +6,8 @@ let selections = {};
 let isDrawing = false;
 let tmsUrl = '';
 let category = '';
+let sessionStartTime = null;
+let sessionInterval = null;
 
 function selectZoom(zoom, clickedBtn) {
     selectedZoom = zoom;
@@ -40,9 +42,19 @@ async function loadTiles() {
         selections = JSON.parse(localStorage.getItem('fairswipe_selections') || '{}');
         currentIndex = parseInt(localStorage.getItem('fairswipe_index') || '0');
 
+        sessionStartTime = parseInt(localStorage.getItem('fairswipe_session_start') || Date.now());
+        if (!localStorage.getItem('fairswipe_session_start')) {
+            localStorage.setItem('fairswipe_session_start', sessionStartTime.toString());
+        }
+
         document.getElementById('setup').classList.add('hidden');
+        document.getElementById('sessionInfo').classList.remove('hidden');
         document.getElementById('viewer').classList.remove('hidden');
         document.getElementById('questionCategory').textContent = category;
+
+        updateSessionInfo();
+        if (sessionInterval) clearInterval(sessionInterval);
+        sessionInterval = setInterval(updateSessionInfo, 1000);
 
         displayTile();
     } catch (error) {
@@ -62,6 +74,8 @@ async function displayTile() {
 
     document.getElementById('progress').textContent =
         `Tile ${currentIndex + 1} of ${motherTiles.length}`;
+
+    updateSessionInfo();
 
     const img = new Image();
     img.crossOrigin = 'anonymous';
@@ -205,6 +219,27 @@ canvas.addEventListener('touchend', (e) => {
     isDrawing = false;
 });
 
+function updateSessionInfo() {
+    const selectedCount = Object.keys(selections).length;
+    document.getElementById('selectedCount').textContent = selectedCount;
+    document.getElementById('totalTiles').textContent = motherTiles.length;
+    document.getElementById('currentTileIndex').textContent = `${currentIndex + 1}/${motherTiles.length}`;
+
+    if (sessionStartTime) {
+        const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+        const hours = Math.floor(elapsed / 3600);
+        const minutes = Math.floor((elapsed % 3600) / 60);
+        const seconds = elapsed % 60;
+
+        let duration = '';
+        if (hours > 0) duration += `${hours}h `;
+        if (minutes > 0 || hours > 0) duration += `${minutes}m `;
+        duration += `${seconds}s`;
+
+        document.getElementById('sessionDuration').textContent = duration.trim();
+    }
+}
+
 function nextTile() {
     if (currentIndex < motherTiles.length - 1) {
         currentIndex++;
@@ -270,6 +305,12 @@ async function finish() {
 
     localStorage.removeItem('fairswipe_selections');
     localStorage.removeItem('fairswipe_index');
+    localStorage.removeItem('fairswipe_session_start');
+
+    if (sessionInterval) {
+        clearInterval(sessionInterval);
+        sessionInterval = null;
+    }
 
     alert('Results downloaded! You can start a new session.');
     location.reload();
