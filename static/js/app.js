@@ -78,7 +78,6 @@ async function displayTile() {
     updateSessionInfo();
 
     const img = new Image();
-    img.crossOrigin = 'anonymous';
     img.onload = () => {
         canvas.width = img.width;
         canvas.height = img.height;
