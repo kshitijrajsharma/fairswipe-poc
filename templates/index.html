@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>POC for fAIrswipe 2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+      <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">
+        POC for fAIrswipe 2.0
+      </h1>
+
+      <div id="setup" class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium mb-2"
+            >Choose your TMS:</label
+          >
+          <input
+            type="text"
+            id="tmsUrl"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
+            value="https://tiles.openaerialmap.org/62d85d11d8499800053796c1/0/62d85d11d8499800053796c2/{z}/{x}/{y}"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium mb-2"
+            >Build AI model to detect:</label
+          >
+          <input
+            type="text"
+            id="category"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
+            placeholder="e.g., solar_panels"
+            value="solar_panels"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium mb-2"
+            >AOI (Area of Interest):</label
+          >
+          <textarea
+            id="aoi"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 font-mono text-sm"
+            rows="8"
+          >
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          [
+            [85.5204749837551, 27.633340352723522],
+            [85.5204749837551, 27.62905414431259],
+            [85.52480716916966, 27.62905414431259],
+            [85.52480716916966, 27.633340352723522],
+            [85.5204749837551, 27.633340352723522]
+          ]
+        ],
+        "type": "Polygon"
+      }
+    }
+  ]
+}</textarea
+          >
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium mb-2"
+            >Zoom Level:</label
+          >
+          <div class="flex gap-3 flex-wrap">
+            <button
+              class="zoom-btn px-6 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+              onclick="selectZoom(18, this)"
+            >
+              18
+            </button>
+            <button
+              class="zoom-btn px-6 py-2 rounded-md bg-gray-800 text-white hover:bg-gray-900 transition-colors"
+              onclick="selectZoom(19, this)"
+            >
+              19
+            </button>
+            <button
+              class="zoom-btn px-6 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+              onclick="selectZoom(20, this)"
+            >
+              20
+            </button>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium mb-2"
+            >Mini Tile Grid:</label
+          >
+          <input
+            type="number"
+            id="miniGrid"
+            value="2"
+            min="1"
+            max="4"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
+          />
+        </div>
+
+        <button
+          onclick="loadTiles()"
+          class="w-full bg-gray-800 text-white py-3 px-6 rounded-md hover:bg-gray-900 transition-colors font-medium"
+        >
+          Load
+        </button>
+      </div>
+
+      <div id="viewer" class="hidden">
+        <div
+          class="bg-gray-800 text-white px-6 py-3 rounded-t-lg text-center font-medium"
+        >
+          <span id="progress"></span>
+        </div>
+        <div class="bg-white rounded-b-lg shadow-md p-6">
+          <div
+            class="bg-gray-50 border border-gray-300 px-4 py-3 rounded-md mb-4"
+          >
+            Turn the mini grids to green by clicking or swiping where you think
+            <strong id="questionCategory"></strong> exists
+          </div>
+          <canvas
+            id="tileCanvas"
+            class="border-2 border-gray-800 cursor-crosshair mx-auto max-w-full"
+          ></canvas>
+          <div class="flex justify-between items-center mt-4 flex-wrap gap-3">
+            <button
+              onclick="previousTile()"
+              class="bg-gray-800 text-white py-2 px-6 rounded-md hover:bg-gray-900 transition-colors"
+            >
+              Previous (Arrow Left)
+            </button>
+            <button
+              onclick="nextTile()"
+              class="bg-gray-800 text-white py-2 px-6 rounded-md hover:bg-gray-900 transition-colors"
+            >
+              Next (Arrow Right)
+            </button>
+            <button
+              onclick="finish()"
+              class="bg-green-600 text-white py-2 px-6 rounded-md hover:bg-green-700 transition-colors font-medium"
+            >
+              Finish & Download
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>

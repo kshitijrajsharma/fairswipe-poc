@@ -1,0 +1,8 @@
+#tileCanvas {
+  touch-action: none;
+}
+
+.zoom-btn.active {
+  background-color: rgb(31, 41, 55);
+  color: white;
+}
