@@ -22,6 +22,7 @@ class TilesRequest(BaseModel):
 class GeoJSONRequest(BaseModel):
     tile_ids: list[dict]
     category: str
+    tms_url: str
 
 @app.get("/")
 async def read_index(request: Request):
@@ -114,6 +115,7 @@ async def create_geojson(request: GeoJSONRequest):
                 },
                 "properties": {
                     "category": request.category,
+                    "tms_url": request.tms_url,
                     "tile_x": tile["x"],
                     "tile_y": tile["y"],
                     "tile_z": tile["z"]

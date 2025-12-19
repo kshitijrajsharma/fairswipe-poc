@@ -295,6 +295,7 @@ async function finish() {
 
     const json = {
         category: category,
+        tms_url: tmsUrl,
         selected_tiles: selectedTiles,
         total_tiles: motherTiles.length,
         config: config
@@ -311,7 +312,7 @@ async function finish() {
         const response = await fetch('/api/geojson', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ tile_ids: selectedTiles, category: category })
+            body: JSON.stringify({ tile_ids: selectedTiles, category: category, tms_url: tmsUrl })
         });
 
         const geojson = await response.json();
