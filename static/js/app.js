@@ -12,11 +12,11 @@ let sessionInterval = null;
 function selectZoom(zoom, clickedBtn) {
     selectedZoom = zoom;
     document.querySelectorAll('.zoom-btn').forEach(btn => {
-        btn.classList.remove('active', 'bg-blue-600', 'text-white');
+        btn.classList.remove('bg-gray-700', 'text-white');
         btn.classList.add('bg-gray-200', 'text-gray-700');
     });
     clickedBtn.classList.remove('bg-gray-200', 'text-gray-700');
-    clickedBtn.classList.add('active', 'bg-blue-600', 'text-white');
+    clickedBtn.classList.add('bg-gray-700', 'text-white');
 }
 
 async function loadTiles() {
@@ -160,16 +160,20 @@ const canvas = document.getElementById('tileCanvas');
 canvas.addEventListener('mousedown', (e) => {
     isDrawing = true;
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
     toggleCell(x, y);
 });
 
 canvas.addEventListener('mousemove', (e) => {
     if (!isDrawing) return;
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
 
     const child = getChildTileFromCoords(x, y);
     if (!child) return;
@@ -190,8 +194,10 @@ canvas.addEventListener('touchstart', (e) => {
     isDrawing = true;
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (touch.clientX - rect.left) * scaleX;
+    const y = (touch.clientY - rect.top) * scaleY;
     toggleCell(x, y);
 });
 
@@ -200,8 +206,10 @@ canvas.addEventListener('touchmove', (e) => {
     if (!isDrawing) return;
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (touch.clientX - rect.left) * scaleX;
+    const y = (touch.clientY - rect.top) * scaleY;
 
     const child = getChildTileFromCoords(x, y);
     if (!child) return;
@@ -237,6 +245,21 @@ function updateSessionInfo() {
         duration += `${seconds}s`;
 
         document.getElementById('sessionDuration').textContent = duration.trim();
+    }
+}
+
+function clearSession() {
+    if (confirm('Are you sure you want to clear the current session? All selections will be lost.')) {
+        localStorage.removeItem('fairswipe_selections');
+        localStorage.removeItem('fairswipe_index');
+        localStorage.removeItem('fairswipe_session_start');
+
+        if (sessionInterval) {
+            clearInterval(sessionInterval);
+            sessionInterval = null;
+        }
+
+        location.reload();
     }
 }
 
